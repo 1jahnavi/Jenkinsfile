@@ -1,0 +1,68 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: your-app
+  template:
+    metadata:
+      labels:
+        app: your-app
+    spec:
+      containers:
+      - name: your-container
+        image: your-image:tag
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        env:
+          -name: DB_HOST
+            valuefrom:
+              configMapKeyRef:
+                name: configrpname
+                key: DB_HOST  
+                env:
+          -name: DB_UserId
+            valuefrom:
+              configMapKeyRef:
+                name: configrpname
+                key: DB_UserId 
+                env:
+          -name: DB_Password
+            valuefrom:
+              secretKeyRef:
+                name: my-secret
+                key: DB_Password
+      ports:
+            - containerport: 80
+              name: MYAPP
+              volumeMounts:
+              -name: localtime
+                mountPath: /etc/localtime
+      volumes:
+            - name: localtime
+              hostpath:
+                path: /user/nanda/newrepo
+                restartpolicy: Always
